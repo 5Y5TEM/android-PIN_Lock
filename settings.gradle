@@ -1,0 +1,2 @@
+rootProject.name='PIN_Locker'
+include ':app'
