@@ -1,3 +1,29 @@
 <resources>
     <string name="app_name">PIN_Locker</string>
+    <string name="set_1">Set a password</string>
+    <string name="set_2">(Note: the password should only contain digits. Length: 4-8 characters)</string>
+    <string name="ok">OK</string>
+    <string name="Save_pw">Save password</string>
+    <string name="cancel">Cancel</string>
+    <string name="set_3">Confirm password</string>
+    <string name="confirm_pw">Please enter your current password</string>
+    <string name="main_btn1">Set / Change password</string>
+    <string name="switch_btn">Activate Lock</string>
+    <string name="set_dest_pw">Set / Change destroy password</string>
+    <string name="fgt_dest_pw">Forgot destroy password</string>
+    <string name="set_question">Please set up a security question.\nYou can set your password afterwards.\nThis is for the case you forget your passwords.</string>
+    <string name="set_answer">Answer</string>
+    <string name="cont">Continue</string>
+    <string name="forgot_pw_note">Please answer the security question. Once answered, you can set a new password.</string>
+
+    <string-array name="security_questions">
+        <item>What is the name of your first best friend?</item>
+        <item>What was the name of your first pet?</item>
+        <item>What is the maiden name of your mother?</item>
+        <item>What was the first film you saw in theater?</item>
+        <item>Where did you go the first time you flew on a plane?</item>
+        <item>What was your childhood nickname?</item>
+        <item>In what city or town was your father born?</item>
+        <item>What was the last name of your first grade teacher?</item>
+    </string-array>
 </resources>

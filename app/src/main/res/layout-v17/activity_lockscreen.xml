@@ -28,7 +28,17 @@
 
     -->
 
+    <View
+        android:id="@+id/view2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#99020202"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
+    
     <TextClock
         android:id="@+id/textClock"
         android:textSize="64sp"
@@ -40,14 +50,25 @@
         app:layout_constraintBottom_toTopOf="@id/guideline3"
         tools:targetApi="jelly_bean_mr1" />
 
-    <TextView
+
+    <EditText
         android:id="@+id/input"
-        android:layout_width="142dp"
-        android:layout_height="50dp"
+        android:layout_width="132dp"
+        android:layout_height="54dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp"
         android:background="@android:color/transparent"
-        android:text=" "
+        android:ems="10"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:inputType="numberPassword"
+        android:singleLine="true"
+        android:text=""
         android:textColor="@android:color/white"
         android:textSize="36dp"
+        app:backgroundTint="#FFFFFF"
         app:layout_constraintBottom_toTopOf="@+id/guideline4"
         app:layout_constraintEnd_toStartOf="@+id/guideline10"
         app:layout_constraintStart_toStartOf="@+id/guideline6"
@@ -62,6 +83,7 @@
         android:drawableStart="@drawable/backspace"
         android:drawableLeft="@drawable/backspace"
         android:text=""
+        android:padding="15dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline4"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintStart_toStartOf="@+id/guideline10"
@@ -76,6 +98,7 @@
         android:text="1"
         android:textColor="@android:color/white"
         android:textSize="30dp"
+        android:padding="15dp"
         app:layout_constraintBottom_toTopOf="@+id/button4"
         app:layout_constraintEnd_toStartOf="@+id/guideline9"
         app:layout_constraintStart_toStartOf="@+id/guideline6"
@@ -89,6 +112,7 @@
         android:text="2"
         android:textColor="@android:color/white"
         android:textSize="30dp"
+        android:padding="15dp"
         app:layout_constraintBottom_toTopOf="@+id/button5"
         app:layout_constraintEnd_toStartOf="@+id/guideline10"
         app:layout_constraintStart_toStartOf="@+id/guideline9"
@@ -102,6 +126,7 @@
         android:text="3"
         android:textColor="@android:color/white"
         android:textSize="30dp"
+        android:padding="15dp"
         app:layout_constraintBottom_toTopOf="@+id/button6"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintStart_toStartOf="@+id/guideline10"
@@ -115,6 +140,7 @@
         android:text="4"
         android:textColor="@android:color/white"
         android:textSize="30dp"
+        android:padding="15dp"
         app:layout_constraintEnd_toStartOf="@+id/guideline9"
         app:layout_constraintStart_toStartOf="@+id/guideline6"
         app:layout_constraintTop_toBottomOf="@+id/button1"
@@ -128,6 +154,7 @@
         android:text="5"
         android:textColor="@android:color/white"
         android:textSize="30dp"
+        android:padding="15dp"
         app:layout_constraintEnd_toStartOf="@+id/guideline10"
         app:layout_constraintStart_toStartOf="@+id/guideline9"
         app:layout_constraintTop_toBottomOf="@+id/button2"
@@ -141,6 +168,7 @@
         android:text="6"
         android:textColor="@android:color/white"
         android:textSize="30dp"
+        android:padding="15dp"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintStart_toStartOf="@+id/guideline10"
         app:layout_constraintTop_toBottomOf="@+id/button3"
@@ -154,6 +182,7 @@
         android:text="7"
         android:textColor="@android:color/white"
         android:textSize="30dp"
+        android:padding="15dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline8"
         app:layout_constraintEnd_toStartOf="@+id/guideline9"
         app:layout_constraintStart_toStartOf="@+id/guideline6"
@@ -167,6 +196,7 @@
         android:text="8"
         android:textColor="@android:color/white"
         android:textSize="30dp"
+        android:padding="15dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline8"
         app:layout_constraintEnd_toStartOf="@+id/guideline10"
         app:layout_constraintStart_toStartOf="@+id/guideline9"
@@ -180,6 +210,7 @@
         android:text="9"
         android:textColor="@android:color/white"
         android:textSize="30dp"
+        android:padding="15dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline8"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintStart_toStartOf="@+id/guideline10"
@@ -193,6 +224,7 @@
         android:text="0"
         android:textColor="@android:color/white"
         android:textSize="30dp"
+        android:padding="15dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline5"
         app:layout_constraintEnd_toStartOf="@+id/guideline10"
         app:layout_constraintStart_toStartOf="@+id/guideline9"
@@ -206,6 +238,7 @@
         android:drawableStart="@drawable/checkmark"
         android:drawableLeft="@drawable/checkmark"
         android:text=""
+        android:padding="15dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline5"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintStart_toStartOf="@+id/guideline10"
@@ -219,6 +252,7 @@
         android:text="EMERGENCY"
         android:textColor="@android:color/white"
         android:textSize="10dp"
+        android:padding="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline10"
         app:layout_constraintStart_toStartOf="@+id/guideline9"
@@ -309,6 +343,7 @@
         app:layout_constraintTop_toBottomOf="@id/guideline4"
         app:layout_constraintEnd_toStartOf="@id/guideline7"
         app:layout_constraintStart_toEndOf="@id/guideline6"/>
+
 
 
 

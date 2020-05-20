@@ -1,43 +1,182 @@
 package com.subcode.pin_locker;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.Activity;
-import android.app.KeyguardManager;
-import android.content.BroadcastReceiver;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import android.Manifest;
+import android.app.ActivityManager;
+import android.app.WallpaperManager;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
+import android.os.Handler;
+import android.view.Display;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private int currentApiVersion;
+    private String password;
+    public static int width, height;
+    private static final int REQUEST_READ_PHONE_STATE = 0;
+//    public static boolean is_active;
+    public static boolean service_is_running;
+    public static String pw_type = "password";
+    public static Drawable wallpaperDrawable1;
 
 
 
+    private static final String KIOSK_PACKAGE = "com.example.kiosk";
+    private static final String PLAYER_PACKAGE = "com.subcode.pin_locker";
+    private static final String[] PACKAGE = {KIOSK_PACKAGE, PLAYER_PACKAGE};
+//    ComponentName devAdminReceiver;
+
+
+    /**
+     * Request permission to access system wallpaper
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_READ_PHONE_STATE:
+                if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    //TODO
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+
+
+
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+        // Get Screen Size of Device
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        width = size.x;
+        height = size.y;
+
+
         makeFullScreen();
-        startService(new Intent(this,LockScreenService.class));
+//        startService(new Intent(this,LockScreenService.class));
 
-        setContentView(R.layout.activity_main);
+//        Context context = getApplicationContext();
+//        DevicePolicyManager dpm =
+//                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+//        ComponentName adminName = getComponentName(context);
+//        dpm.setLockTaskPackages(adminName, PACKAGE);
 
 
-        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-        intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
-        BroadcastReceiver mReceiver = new LockScreenReceiver();
-        registerReceiver(mReceiver, intentFilter);
+        /**
+         * On initial start, let user set security question
+         * Check if variable is set
+         */
+        // load the password
+        SharedPreferences settings = getSharedPreferences("PREPS", 0);
+        String answer = settings.getString("security_answer", "");
 
+        if(answer.equals("")){
+            Intent intent = new Intent(getApplicationContext(), SetSecurityQuestionActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
+        else {
+
+            setContentView(R.layout.activity_main);
+
+
+            // Check if service is running
+            if (isMyServiceRunning(LockScreenService.class)) service_is_running = true;
+
+
+            // Grab buttons
+            Button set_pw = findViewById(R.id.set_pw);
+            set_pw.setOnClickListener(this);
+
+            Button forgot_pw = findViewById(R.id.fgt_pw);
+            forgot_pw.setOnClickListener(this);
+
+            Button set_dest = findViewById(R.id.btn_set_dest);
+            set_dest.setOnClickListener(this);
+
+            Button forgot_dest = findViewById(R.id.btn_forgot_dest);
+            forgot_dest.setOnClickListener(this);
+
+
+            final Switch sw = findViewById(R.id.switch2);
+            if (service_is_running) sw.setChecked(true);
+
+            sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    SharedPreferences settings = getSharedPreferences("PREPS", 0);
+                    String password = settings.getString("password", "");
+
+                    if (isChecked) {
+                        if(password.equals("")){
+                            // If no password set, don't allow to start the lock service
+                            sw.setChecked(false);
+                            Toast.makeText(MainActivity.this, "Set a lock password first!", Toast.LENGTH_SHORT).show();
+                        }
+                        else startService();
+
+                    } else {
+                        stopService();
+                    }
+                }
+            });
+
+
+            /**
+             * Check permission to access system wallpaper
+             */
+            int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_PHONE_STATE);
+            } else {
+                //TODO
+            }
+
+
+            /**
+             * Access system wallpaper
+             */
+            WallpaperManager wallpaperManager1 = WallpaperManager
+                    .getInstance(getApplicationContext());
+            wallpaperDrawable1 = wallpaperManager1.getDrawable();
+
+            if (wallpaperDrawable1 == null) {
+                Resources res = getResources();
+                wallpaperDrawable1 = res.getDrawable(R.color.colorPrimaryDark);
+
+            }
+
+        }
+        getWindow().setBackgroundDrawable(wallpaperDrawable1);
     }
+
 
 
 
@@ -67,48 +206,101 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Back Button functionality
-     */
-    @Override
-    public void onBackPressed() {
-        return; //Do nothing!
-    }
 
-    /**
-     * When the Unlock Button is pressed, the following function is called:
-     */
-    public void unlockScreen(View view) {
-        //Instead of using finish(), this totally destroys the process
-        android.os.Process.killProcess(android.os.Process.myPid());
+
+
+    @Override
+    public void onClick(View v) {
+        Intent intent = new Intent(getApplicationContext(), ForgotPasswordActivity.class);
+
+        switch (v.getId()) {
+
+            case R.id.set_pw:
+                pw_type = "password";
+                setPassword(v, "password");
+                break;
+
+            case R.id.fgt_pw:
+                pw_type = "password";
+                startActivity(intent);
+                finish();
+                break;
+
+            case R.id.btn_set_dest:
+                pw_type = "destroy_pw";
+                setPassword(v, "destroy_pw");
+                break;
+
+            case R.id.btn_forgot_dest:
+                pw_type = "destroy_pw";
+                startActivity(intent);
+                finish();
+                break;
+
+            default:
+                break;
+
+        }
     }
 
 
     /**
      * Open Window to set password
-     * @param view
      */
-    public void setPassword(View view) {
-        // inflate the layout of the popup window
-        LayoutInflater inflater = (LayoutInflater)
-                getSystemService(LAYOUT_INFLATER_SERVICE);
-        View popupView = inflater.inflate(R.layout.setpassword, null);
+    public void setPassword(View view, String pw) {
 
-        // create the popup window
-        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
-        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-        boolean focusable = true; // lets taps outside the popup also dismiss it
-        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+        // Load the password
+        SharedPreferences settings = getSharedPreferences("PREPS", 0);
+        password = settings.getString(pw, "");
 
-        // show the popup window
-        // which view you pass in doesn't matter, it is only used for the window token
-        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
-
-
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (password.equals("")){
+        // If there is no password
+                    Intent intent = new Intent(getApplicationContext(), CreatePasswordActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+                else{
+        //If there is a password
+                    Intent intent = new Intent(getApplicationContext(), ChangePasswordActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+        },0);
     }
 
+
+
+
+
+
+
+
+    public void startService() {
+        Intent serviceIntent = new Intent(this, LockScreenService.class);
+        serviceIntent.putExtra("inputExtra", "input");
+        ContextCompat.startForegroundService(this, serviceIntent);
     }
 
 
+    public void stopService() {
+        Intent serviceIntent = new Intent(this, LockScreenService.class);
+        stopService(serviceIntent);
+    }
+
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }
