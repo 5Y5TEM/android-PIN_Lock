@@ -89,7 +89,13 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
         /**
          * Create the Overlay
          */
-        WindowManager.LayoutParams home_params = new WindowManager.LayoutParams(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+        int LAYOUT_FLAG;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            LAYOUT_FLAG = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        } else {
+            LAYOUT_FLAG = WindowManager.LayoutParams.TYPE_PHONE;
+        }
+        WindowManager.LayoutParams home_params = new WindowManager.LayoutParams(LAYOUT_FLAG,
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_DIM_BEHIND);
 
         wm = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
@@ -332,6 +338,8 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
                 } else {
                     // Wrong password
                     input.setText("");
+
+
                     // Vibrate for 500 milliseconds
                     Vibrator vib = (Vibrator) getSystemService(Context. VIBRATOR_SERVICE ) ;
                     assert vib != null;
@@ -347,6 +355,17 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
                     counter += 1;
 
                     if (counter == 3){
+
+                        GMailSender sender = new GMailSender("pinlockapp@gmail.com", "ThisIsLockscreenMail");
+                        try {
+                            sender.sendMail("Unauthorized access attempt ",
+                                    "Someone tried to access your phone and got the passcode wrong.",
+                                    "pinlockapp@gmail.com",
+                                    "meltem@subasioglu.de");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
                         // DO delete activity here
                         // Use package name which we want to check
                         boolean isTelegramInstalled = appInstalledOrNot("org.telegram.messenger");
@@ -361,6 +380,7 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
 
 //                        AccountManager am = AccountManager.get(this);
 //                        Account[] accounts = am.getAccounts();
+
                         }
 
                         if(isTelegramXInstaled) {

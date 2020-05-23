@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.subcode.pin_locker">
 
+    <uses-feature android:name="android.hardware.camera"
+        android:required="true" />
+
     <uses-permission
         android:name="android.permission.GET_ACCOUNTS"
         android:maxSdkVersion="22" />
