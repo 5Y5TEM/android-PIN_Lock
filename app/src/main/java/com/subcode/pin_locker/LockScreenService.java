@@ -4,15 +4,12 @@ import android.app.Activity;
 import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.IBinder;
-import android.view.WindowManager;
-
 import androidx.annotation.NonNull;
 import androidx.core.app.JobIntentService;
 import androidx.core.app.NotificationCompat;
@@ -72,16 +69,14 @@ public class LockScreenService extends JobIntentService {
         editor.putBoolean("service_is_running", true);
         editor.apply();
 
-//        if(is_active) {
-
-        String input = intent.getStringExtra("inputExtra");
+//        String input = intent.getStringExtra("inputExtra");
 
             Intent notificationIntent = new Intent(this, MainActivity.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+//            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
             Notification notification = new NotificationCompat.Builder(this, Channel_ID)
-                    .setContentTitle("Lockscreen Service")
-                    .setContentText("input")
+                    .setContentTitle("Lockscreen")
+                    .setContentText("active")
                     .setSmallIcon(R.drawable.lock_icon)
                     .build();
 
@@ -102,9 +97,6 @@ public class LockScreenService extends JobIntentService {
         startForeground(1, notification);
             return START_STICKY;
 
-
-//        }
-//        else return START_NOT_STICKY;
     }
 
     @Override

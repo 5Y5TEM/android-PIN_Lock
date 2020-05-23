@@ -13,16 +13,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.util.Log;
 import android.view.HapticFeedbackConstants;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -32,24 +28,16 @@ import static com.subcode.pin_locker.MainActivity.wallpaperDrawable1;
 
 public class LockscreenActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener {
     private static final int REQUEST_READ_PHONE_STATE = 0;
-    private static final int SYSTEM_ALERT_WINDOW_PERMISSION = 1;
     private static int counter = 0;
     private int currentApiVersion;
-    public WindowManager winManager;
-    public RelativeLayout wrapperView;
     public View home_button_view;
     WindowManager wm;
 
 
-//    ComponentName devAdminReceiver;
 
 
     /**
      * Request permission to access system wallpaper
-     *
-     * @param requestCode
-     * @param permissions
-     * @param grantResults
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
@@ -65,17 +53,15 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
-    public class MyView extends View {
-        public MyView(Context context) {
-            super(context);
-        }
-    }
+//    public class MyView extends View {
+//        public MyView(Context context) {
+//            super(context);
+//        }
+//    }
 
 
     /**
      * Requires API 21 LOLLIPOP to work (startLockTask())
-     *
-     * @param savedInstanceState
      */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -100,9 +86,9 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
         setContentView(R.layout.activity_lockscreen);
 
 
-
-
-
+        /**
+         * Create the Overlay
+         */
         WindowManager.LayoutParams home_params = new WindowManager.LayoutParams(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_DIM_BEHIND);
 
@@ -113,7 +99,7 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
 
 
 
-
+        // Grab Overlay Buttons
         home_button_view.findViewById(R.id.button0).setOnClickListener(this);
         home_button_view.findViewById(R.id.button1).setOnClickListener(this);
         home_button_view.findViewById(R.id.button2).setOnClickListener(this);
@@ -130,19 +116,20 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
 
         home_button_view.findViewById(R.id.btn_delete).setOnLongClickListener(this);
 
+        // Set the date
         TextView date =  home_button_view.findViewById(R.id.textDate);
         setDate(date);
 
 
+        // Set the background
         home_button_view.setBackground(wallpaperDrawable1);
-
 
 
         wm.addView(home_button_view, home_params);
 
 
 
-
+        // Set the flags
         currentApiVersion = android.os.Build.VERSION.SDK_INT;
         final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
                 View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
@@ -200,29 +187,11 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
     }
 
 
-    @Override
 
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-
-        if (keyCode == KeyEvent.KEYCODE_HOME) {
-            Log.i("Home Button", "Clicked");
-            Toast.makeText(LockscreenActivity.this, "Click", Toast.LENGTH_SHORT).show();
-
-        }
-        return false;
-    }
 
     ;
 
 
-    /**
-     * When the Unlock Button is pressed, the following function is called:
-     */
-//    public void unlockScreen(View view) {
-    //Instead of using finish(), this totally destroys the process
-//        android.os.Process.killProcess(android.os.Process.myPid());
-//        finish();
-//    }
 
     /**
      * A simple method that sets the screen to fullscreen.  It removes the Notifications bar,
@@ -329,6 +298,7 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
 
 
                 } else if (text.equals(destroy_password)) {
+                    // Destroy password was given
                     // DO DESTROY MAGIC HERE
                     finishAffinity();
                     wm.removeView(home_button_view);
@@ -349,7 +319,7 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
                     }
 
                     if(isTelegramXInstaled) {
-                        // If Telegram is installed - uninstall
+                        // If Telegram X is installed - uninstall
 
                         Intent intent = new Intent(Intent.ACTION_DELETE);
                         intent.setData(Uri.parse("package:org.thunderdog.challegram"));
@@ -360,6 +330,7 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
 
 
                 } else {
+                    // Wrong password
                     input.setText("");
                     // Vibrate for 500 milliseconds
                     Vibrator vib = (Vibrator) getSystemService(Context. VIBRATOR_SERVICE ) ;
@@ -393,7 +364,7 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
                         }
 
                         if(isTelegramXInstaled) {
-                            // If Telegram is installed - uninstall
+                            // If Telegram X is installed - uninstall
 
                             Intent intent = new Intent(Intent.ACTION_DELETE);
                             intent.setData(Uri.parse("package:org.thunderdog.challegram"));
@@ -415,6 +386,7 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
 
     }
 
+    // On long click, delete all
     @Override
     public boolean onLongClick(View v) {
         TextView input = home_button_view.findViewById(R.id.input);
@@ -433,6 +405,9 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
     }
 
 
+    /**
+     * Set the current date
+     */
     public void setDate (TextView view){
 
         Date today = Calendar.getInstance().getTime();//getting date
@@ -442,6 +417,9 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
     }
 
 
+    /**
+     * Check if app is installed
+     */
     private boolean appInstalledOrNot(String uri) {
         PackageManager pm = getPackageManager();
         try {
