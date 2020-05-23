@@ -14,7 +14,7 @@
         android:background="#000000"
 
 
-            <TextClock
+    <TextClock
         android:id="@+id/textClock"
         android:textSize="64sp"
         android:layout_width="300dp"
@@ -38,17 +38,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
-    
-    <TextClock
-        android:id="@+id/textClock"
-        android:textSize="64sp"
-        android:layout_width="300dp"
-        android:layout_height="120dp"
-        app:layout_constraintStart_toEndOf="@id/guideline9"
-        app:layout_constraintEnd_toStartOf="@id/guideline7"
-        app:layout_constraintTop_toBottomOf="@id/guideline"
-        app:layout_constraintBottom_toTopOf="@id/guideline3"
-        tools:targetApi="jelly_bean_mr1" />
 
 
     <EditText
@@ -244,7 +233,7 @@
         app:layout_constraintStart_toStartOf="@+id/guideline10"
         app:layout_constraintTop_toTopOf="@+id/guideline8" />
 
-    <Button
+   <!--- <Button
         android:id="@+id/btn_emergency"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -257,27 +246,28 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline10"
         app:layout_constraintStart_toStartOf="@+id/guideline9"
         app:layout_constraintTop_toTopOf="@+id/guideline5" />
+        -->
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.07" />
+        app:layout_constraintGuide_percent="0.05" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.22" />
+        app:layout_constraintGuide_percent="0.20" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.3" />
+        app:layout_constraintGuide_percent="0.2995896" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline4"
@@ -298,7 +288,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.10" />
+        app:layout_constraintGuide_percent="0.15" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline9"
@@ -319,7 +309,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.9" />
+        app:layout_constraintGuide_percent="0.85" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline8"
@@ -337,7 +327,7 @@
 
     <View
         android:id="@+id/view3"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="1dp"
         android:background="@android:color/darker_gray"
         app:layout_constraintTop_toBottomOf="@id/guideline4"
@@ -345,6 +335,33 @@
         app:layout_constraintStart_toEndOf="@id/guideline6"/>
 
 
+    <TextClock
+        android:id="@+id/textClock"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:textSize="72dp"
+        android:gravity="center"
+        android:fontFamily="sans-serif-light"
+        app:layout_constraintBottom_toTopOf="@id/guideline2"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guideline"
+        tools:targetApi="jelly_bean_mr1" />
+
+    <TextView
+        android:id="@+id/textDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-light"
+        android:textSize="20dp"
+        android:paddingVertical="0dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@id/guideline3"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textClock"
+        app:layout_constraintVertical_bias="0.0" />
 
 
     <!---

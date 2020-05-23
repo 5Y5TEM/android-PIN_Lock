@@ -1,14 +1,8 @@
 package com.subcode.pin_locker;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import android.Manifest;
-import android.app.WallpaperManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -16,40 +10,23 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import static com.subcode.pin_locker.MainActivity.pw_type;
+import static com.subcode.pin_locker.MainActivity.wallpaperDrawable1;
 
 public class CreatePasswordActivity extends AppCompatActivity {
 
     EditText txt_setPw, txt_confirmPw;
+    TextView txt_info;
     Button btn_cancel, btn_save;
 
-    private static final int REQUEST_READ_PHONE_STATE = 0;
     private int currentApiVersion;
-
-//    ComponentName devAdminReceiver;
 
 
     /**
-     * Request permission to access system wallpaper
-     * @param requestCode
-     * @param permissions
-     * @param grantResults
+     * OnCreate
      */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_READ_PHONE_STATE:
-                if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    //TODO
-                }
-                break;
-
-            default:
-                break;
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,25 +34,11 @@ public class CreatePasswordActivity extends AppCompatActivity {
         makeItFullScreen();
 
 
-        /**
-         * Check permission to access system wallpaper
-         */
-        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_PHONE_STATE);
-        } else {
-            //TODO
-        }
 
 
         /**
-         * Access system wallpaper
+         * Set system wallpaper as background
          */
-        WallpaperManager wallpaperManager1 = WallpaperManager
-                .getInstance(getApplicationContext());
-        final Drawable wallpaperDrawable1 = wallpaperManager1.getDrawable();
-
         if (wallpaperDrawable1==null)
         {
             Resources res = getResources();
@@ -83,16 +46,23 @@ public class CreatePasswordActivity extends AppCompatActivity {
             getWindow().setBackgroundDrawable(drawable1);
 
         }
-        else
-        {
-            getWindow().setBackgroundDrawable(wallpaperDrawable1);
-        }
+        else getWindow().setBackgroundDrawable(wallpaperDrawable1);
+
 
 
         txt_setPw = findViewById(R.id.setNewPw);
         txt_confirmPw = findViewById(R.id.confirmNewPw);
         btn_cancel = findViewById(R.id.btn_cancel);
         btn_save = findViewById(R.id.btn_savePw);
+        txt_info = findViewById(R.id.txt_setPw);
+
+        // Set text according to password type
+        if(pw_type.equals("password")){
+            txt_info.setText("Set a LOCK password");
+        }
+        else if(pw_type.equals("destroy_pw")){
+            txt_info.setText("Set a DESTROY password");
+        }
 
 
         btn_save.setOnClickListener(new View.OnClickListener(){
@@ -207,6 +177,17 @@ public class CreatePasswordActivity extends AppCompatActivity {
         });
     }
 
+
+    /**
+     * Back Button functionality
+     */
+    @Override
+    public void onBackPressed() {
+        // Open Main Activity again
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
 
     /**
      * A simple method that sets the screen to fullscreen.  It removes the Notifications bar,

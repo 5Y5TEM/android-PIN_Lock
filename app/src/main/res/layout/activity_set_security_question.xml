@@ -135,6 +135,7 @@
         android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
         android:layout_marginRight="24dp"
+        android:background="@android:color/white"
         app:layout_constraintEnd_toEndOf="@+id/view_setPw"
         app:layout_constraintStart_toStartOf="@+id/view_setPw"
         app:layout_constraintTop_toBottomOf="@+id/textView4" />

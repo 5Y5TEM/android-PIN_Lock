@@ -1,14 +1,8 @@
 package com.subcode.pin_locker;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import android.Manifest;
-import android.app.WallpaperManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -19,34 +13,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import static com.subcode.pin_locker.MainActivity.pw_type;
+import static com.subcode.pin_locker.MainActivity.wallpaperDrawable1;
 
 public class ChangePasswordActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final int REQUEST_READ_PHONE_STATE = 0;
     private int currentApiVersion;
 
-//    ComponentName devAdminReceiver;
 
-
-    /**
-     * Request permission to access system wallpaper
-     * @param requestCode
-     * @param permissions
-     * @param grantResults
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_READ_PHONE_STATE:
-                if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    //TODO
-                }
-                break;
-
-            default:
-                break;
-        }
-    }
 
 
     @Override
@@ -56,25 +29,11 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
         makeItFullScreen();
 
 
-        /**
-         * Check permission to access system wallpaper
-         */
-        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_PHONE_STATE);
-        } else {
-            //TODO
-        }
 
 
         /**
-         * Access system wallpaper
+         * Set System Wallpaper as background
          */
-        WallpaperManager wallpaperManager1 = WallpaperManager
-                .getInstance(getApplicationContext());
-        final Drawable wallpaperDrawable1 = wallpaperManager1.getDrawable();
-
         if (wallpaperDrawable1==null)
         {
             Resources res = getResources();
@@ -82,14 +41,10 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
             getWindow().setBackgroundDrawable(drawable1);
 
         }
-        else
-        {
-            getWindow().setBackgroundDrawable(wallpaperDrawable1);
-        }
+        else getWindow().setBackgroundDrawable(wallpaperDrawable1);
 
-        /**
-         * Get Buttons and Textview
-         */
+
+        // Grab Buttons and Textview
 
         TextView input = findViewById(R.id.input);
 
@@ -247,7 +202,16 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
 
     }
 
-
+    /**
+     * Back Button functionality
+     */
+    @Override
+    public void onBackPressed() {
+        // Open Main Activity again
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
 
 
     /**

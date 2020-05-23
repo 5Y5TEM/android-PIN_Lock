@@ -7,8 +7,6 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.app.ActivityManager;
 import android.app.WallpaperManager;
-import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,9 +14,11 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.view.Display;
 import android.view.View;
 import android.widget.Button;
@@ -31,17 +31,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String password;
     public static int width, height;
     private static final int REQUEST_READ_PHONE_STATE = 0;
-//    public static boolean is_active;
+    private static final int SYSTEM_ALERT_WINDOW_PERMISSION = 0;
+
     public static boolean service_is_running;
     public static String pw_type = "password";
     public static Drawable wallpaperDrawable1;
 
-
-
-    private static final String KIOSK_PACKAGE = "com.example.kiosk";
-    private static final String PLAYER_PACKAGE = "com.subcode.pin_locker";
-    private static final String[] PACKAGE = {KIOSK_PACKAGE, PLAYER_PACKAGE};
-//    ComponentName devAdminReceiver;
 
 
     /**
@@ -62,8 +57,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
-
+    /**
+     * OnCreate
+     */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         // Get Screen Size of Device
+        // This is for the Lockscreen Overlay in LockScreenActivity
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
@@ -78,14 +75,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         height = size.y;
 
 
+        // Function to make the app fullscreen and hide navigation and toolbar
         makeFullScreen();
-//        startService(new Intent(this,LockScreenService.class));
 
-//        Context context = getApplicationContext();
-//        DevicePolicyManager dpm =
-//                (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-//        ComponentName adminName = getComponentName(context);
-//        dpm.setLockTaskPackages(adminName, PACKAGE);
 
 
         /**
@@ -97,13 +89,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String answer = settings.getString("security_answer", "");
 
         if(answer.equals("")){
+            //If there is no security question set, start the activity
             Intent intent = new Intent(getApplicationContext(), SetSecurityQuestionActivity.class);
             startActivity(intent);
             finish();
         }
 
         else {
-
+            // Security question is set, start main activity
             setContentView(R.layout.activity_main);
 
 
@@ -124,10 +117,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Button forgot_dest = findViewById(R.id.btn_forgot_dest);
             forgot_dest.setOnClickListener(this);
 
-
+            // If service is currently running, set the button to active
             final Switch sw = findViewById(R.id.switch2);
             if (service_is_running) sw.setChecked(true);
 
+            // Toggle button for service ON OFF
             sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     SharedPreferences settings = getSharedPreferences("PREPS", 0);
@@ -139,7 +133,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             sw.setChecked(false);
                             Toast.makeText(MainActivity.this, "Set a lock password first!", Toast.LENGTH_SHORT).show();
                         }
-                        else startService();
+                        else {
+                            // Ask for permission for overlay
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(getApplicationContext())) {
+                                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                        Uri.parse("package:" + getPackageName()));
+                                startActivityForResult(intent, SYSTEM_ALERT_WINDOW_PERMISSION);
+                            }
+
+                            startService();
+                        }
 
                     } else {
                         stopService();
@@ -207,8 +210,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
-
+    /**
+     * OnClick Button Functionalities
+     */
     @Override
     public void onClick(View v) {
         Intent intent = new Intent(getApplicationContext(), ForgotPasswordActivity.class);
@@ -274,12 +278,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
-
-
-
-
-
+    /**
+     * Start the foreground service
+     */
     public void startService() {
         Intent serviceIntent = new Intent(this, LockScreenService.class);
         serviceIntent.putExtra("inputExtra", "input");
@@ -287,12 +288,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+    /**
+     * Stop the foreground service
+     */
     public void stopService() {
         Intent serviceIntent = new Intent(this, LockScreenService.class);
         stopService(serviceIntent);
     }
 
 
+    /**
+     * Check if service is running
+     */
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {

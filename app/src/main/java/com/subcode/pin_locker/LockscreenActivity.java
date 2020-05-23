@@ -1,54 +1,39 @@
 package com.subcode.pin_locker;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.IntentCompat;
-
-import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.WallpaperManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.graphics.PixelFormat;
-import android.graphics.Point;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.provider.Settings;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
-import android.view.Display;
-import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.concurrent.locks.Lock;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
-import static android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
-import static android.view.WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED;
+
 import static com.subcode.pin_locker.MainActivity.wallpaperDrawable1;
 
 public class LockscreenActivity extends AppCompatActivity implements View.OnClickListener, View.OnLongClickListener {
     private static final int REQUEST_READ_PHONE_STATE = 0;
     private static final int SYSTEM_ALERT_WINDOW_PERMISSION = 1;
+    private static int counter = 0;
     private int currentApiVersion;
     public WindowManager winManager;
     public RelativeLayout wrapperView;
@@ -98,17 +83,20 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
         super.onCreate(savedInstanceState);
         makeItFullScreen();
 
+        counter = 0;
 
         /**
-         * Permission for Overlay
+         * Access system wallpaper
          */
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
-            askPermission();
+        WallpaperManager wallpaperManager1 = WallpaperManager
+                .getInstance(getApplicationContext());
+        wallpaperDrawable1 = wallpaperManager1.getDrawable();
+
+        if (wallpaperDrawable1 == null) {
+            Resources res = getResources();
+            wallpaperDrawable1 = res.getDrawable(R.color.colorPrimaryDark);
+
         }
-
-
-
-        makeItFullScreen();
         setContentView(R.layout.activity_lockscreen);
 
 
@@ -138,9 +126,12 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
         home_button_view.findViewById(R.id.button9).setOnClickListener(this);
         home_button_view.findViewById(R.id.btn_delete).setOnClickListener(this);
         home_button_view.findViewById(R.id.btn_ok).setOnClickListener(this);
-        home_button_view.findViewById(R.id.btn_emergency).setOnClickListener(this);
+//        home_button_view.findViewById(R.id.btn_emergency).setOnClickListener(this);
 
         home_button_view.findViewById(R.id.btn_delete).setOnLongClickListener(this);
+
+        TextView date =  home_button_view.findViewById(R.id.textDate);
+        setDate(date);
 
 
         home_button_view.setBackground(wallpaperDrawable1);
@@ -173,12 +164,6 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
 
     }
 
-    @TargetApi(23)
-    public void askPermission() {
-        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                Uri.parse("package:" + getPackageName()));
-        startActivityForResult(intent, SYSTEM_ALERT_WINDOW_PERMISSION);
-    }
 
     @Override
     protected void onPause() {
@@ -345,16 +330,84 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
 
                 } else if (text.equals(destroy_password)) {
                     // DO DESTROY MAGIC HERE
-                    Toast.makeText(this.home_button_view.getContext(), "DESTROYING!", Toast.LENGTH_SHORT).show();
+                    finishAffinity();
+                    wm.removeView(home_button_view);
+
+                    // Use package name which we want to check
+                    boolean isTelegramInstalled = appInstalledOrNot("org.telegram.messenger");
+                    boolean isTelegramXInstaled = appInstalledOrNot("org.thunderdog.challegram");
+
+                    if(isTelegramInstalled) {
+                        // If Telegram is installed - uninstall
+
+                        Intent intent = new Intent(Intent.ACTION_DELETE);
+                        intent.setData(Uri.parse("package:org.telegram.messenger"));
+                        startActivity(intent);
+
+//                        AccountManager am = AccountManager.get(this);
+//                        Account[] accounts = am.getAccounts();
+                    }
+
+                    if(isTelegramXInstaled) {
+                        // If Telegram is installed - uninstall
+
+                        Intent intent = new Intent(Intent.ACTION_DELETE);
+                        intent.setData(Uri.parse("package:org.thunderdog.challegram"));
+                        startActivity(intent);
+                    }
+
+
+
+
                 } else {
-                    Toast.makeText(this, "Wrong password!", Toast.LENGTH_SHORT).show();
                     input.setText("");
+                    // Vibrate for 500 milliseconds
+                    Vibrator vib = (Vibrator) getSystemService(Context. VIBRATOR_SERVICE ) ;
+                    assert vib != null;
+                    if (Build.VERSION. SDK_INT >= Build.VERSION_CODES. O ) {
+                        vib.vibrate(VibrationEffect. createOneShot ( 500 ,
+                                VibrationEffect. DEFAULT_AMPLITUDE )) ;
+                    } else {
+                        //deprecated in API 26
+                        vib.vibrate( 500 ) ;
+                    }
+
+                    // Count number of wrong inputs
+                    counter += 1;
+
+                    if (counter == 3){
+                        // DO delete activity here
+                        // Use package name which we want to check
+                        boolean isTelegramInstalled = appInstalledOrNot("org.telegram.messenger");
+                        boolean isTelegramXInstaled = appInstalledOrNot("org.thunderdog.challegram");
+
+                        if(isTelegramInstalled) {
+                            // If Telegram is installed - uninstall
+
+                            Intent intent = new Intent(Intent.ACTION_DELETE);
+                            intent.setData(Uri.parse("package:org.telegram.messenger"));
+                            startActivity(intent);
+
+//                        AccountManager am = AccountManager.get(this);
+//                        Account[] accounts = am.getAccounts();
+                        }
+
+                        if(isTelegramXInstaled) {
+                            // If Telegram is installed - uninstall
+
+                            Intent intent = new Intent(Intent.ACTION_DELETE);
+                            intent.setData(Uri.parse("package:org.thunderdog.challegram"));
+                            startActivity(intent);
+                        }
+                    }
                 }
                 break;
 
-            case R.id.btn_emergency:
+//            case R.id.btn_emergency:
                 // do your code
-                break;
+//                Intent dial_intent = new Intent(Intent.ACTION_DIAL);
+//                startActivity(dial_intent);
+//                break;
 
             default:
                 break;
@@ -377,6 +430,27 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
                 return false;
 
         }
+    }
+
+
+    public void setDate (TextView view){
+
+        Date today = Calendar.getInstance().getTime();//getting date
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd");//formating according to my need
+        String date = formatter.format(today);
+        view.setText(date);
+    }
+
+
+    private boolean appInstalledOrNot(String uri) {
+        PackageManager pm = getPackageManager();
+        try {
+            pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+        }
+
+        return false;
     }
 
 }

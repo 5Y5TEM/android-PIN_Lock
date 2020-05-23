@@ -1,14 +1,8 @@
 package com.subcode.pin_locker;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import android.Manifest;
-import android.app.WallpaperManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -18,31 +12,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import static com.subcode.pin_locker.MainActivity.pw_type;
+import static com.subcode.pin_locker.MainActivity.wallpaperDrawable1;
 
 public class ForgotPasswordActivity extends AppCompatActivity implements View.OnClickListener {
 public static String question;
 public static String answer;
-private static final int REQUEST_READ_PHONE_STATE = 0;
 private int currentApiVersion;
 
+
     /**
-     * Request permission to access system wallpaper
+     * OnCreate
      */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_READ_PHONE_STATE:
-                if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    //TODO
-                }
-                break;
-
-            default:
-                break;
-        }
-    }
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,30 +39,27 @@ private int currentApiVersion;
         TextView txt_question = findViewById(R.id.txt_question);
         txt_question.setText(question);
 
+        TextView txt_info = findViewById(R.id.textView4);
+        // Set text according to password type
+        if(pw_type.equals("password")){
+            txt_info.setText("Please answer the security question. Once answered, you can set a new LOCK password");
+        }
+        else if(pw_type.equals("destroy_pw")){
+            txt_info.setText("Please answer the security question. Once answered, you can set a new DESTROY password");
+        }
+
+
+
         makeFullScreen();
 
         Button btn_continue = findViewById(R.id.btn_continue);
         btn_continue.setOnClickListener(this);
 
-        /**
-         * Check permission to access system wallpaper
-         */
-        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_PHONE_STATE);
-        } else {
-            //TODO
-        }
 
 
         /**
          * Access system wallpaper
          */
-        WallpaperManager wallpaperManager1 = WallpaperManager
-                .getInstance(getApplicationContext());
-        final Drawable wallpaperDrawable1 = wallpaperManager1.getDrawable();
-
         if (wallpaperDrawable1==null)
         {
             Resources res = getResources();
@@ -156,4 +134,16 @@ private int currentApiVersion;
 
         }
     }
+
+    /**
+     * Back Button functionality
+     */
+    @Override
+    public void onBackPressed() {
+        // Open Main Activity again
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
 }
