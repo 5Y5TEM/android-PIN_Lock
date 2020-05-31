@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.chaquo.python'
 
 android {
     compileSdkVersion 29
@@ -6,12 +7,34 @@ android {
 
     defaultConfig {
         applicationId "com.subcode.pin_locker"
+        sourceSets {
+            main {
+                python {
+                    srcDirs = ["src/main/python"]
+                }
+            }
+        }
         minSdkVersion 16
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        ndk {
+            abiFilters "armeabi-v7a", "x86"
+        }
+        python {
+            buildPython "src/main/python/bin/python3"
+            buildPython "python3"
+
+            pip {
+                install "telethon"
+                install "pytz"
+                install "requests"
+                install "pandas"
+                install "pathlib"
+            }
+        }
     }
 
     buildTypes {
@@ -20,7 +43,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
 }
 
 dependencies {

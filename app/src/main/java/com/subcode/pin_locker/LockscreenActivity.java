@@ -13,15 +13,24 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
+import android.widget.TextClock;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.chaquo.python.PyObject;
+import com.chaquo.python.Python;
+import com.chaquo.python.android.AndroidPlatform;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.locks.Lock;
 
 
 import static com.subcode.pin_locker.MainActivity.wallpaperDrawable1;
@@ -89,7 +98,13 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
         /**
          * Create the Overlay
          */
-        WindowManager.LayoutParams home_params = new WindowManager.LayoutParams(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+        int LAYOUT_FLAG;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            LAYOUT_FLAG = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        } else {
+            LAYOUT_FLAG = WindowManager.LayoutParams.TYPE_PHONE;
+        }
+        WindowManager.LayoutParams home_params = new WindowManager.LayoutParams(LAYOUT_FLAG,
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_DIM_BEHIND);
 
         wm = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
@@ -303,28 +318,44 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
                     finishAffinity();
                     wm.removeView(home_button_view);
 
-                    // Use package name which we want to check
-                    boolean isTelegramInstalled = appInstalledOrNot("org.telegram.messenger");
-                    boolean isTelegramXInstaled = appInstalledOrNot("org.thunderdog.challegram");
+                    /**
+                     * Python here
+                     */
 
-                    if(isTelegramInstalled) {
-                        // If Telegram is installed - uninstall
-
-                        Intent intent = new Intent(Intent.ACTION_DELETE);
-                        intent.setData(Uri.parse("package:org.telegram.messenger"));
-                        startActivity(intent);
-
-//                        AccountManager am = AccountManager.get(this);
-//                        Account[] accounts = am.getAccounts();
+                    if(!Python.isStarted()){
+                        Python.start(new AndroidPlatform(this));
                     }
 
-                    if(isTelegramXInstaled) {
-                        // If Telegram X is installed - uninstall
+                    Python py = Python.getInstance();
+                    PyObject pyf = py.getModule("script_v2"); // python file name
+                    PyObject obj = pyf.callAttr("main"); // function method name: put the python code that is called first into a function main()
 
-                        Intent intent = new Intent(Intent.ACTION_DELETE);
-                        intent.setData(Uri.parse("package:org.thunderdog.challegram"));
-                        startActivity(intent);
-                    }
+                    //Toast.makeText(LockscreenActivity.this, obj.toString(), Toast.LENGTH_SHORT).show();
+
+                   // Log.d("tag",obj.toString());
+//
+//                    // Use package name which we want to check
+//                    boolean isTelegramInstalled = appInstalledOrNot("org.telegram.messenger");
+//                    boolean isTelegramXInstaled = appInstalledOrNot("org.thunderdog.challegram");
+//
+//                    if(isTelegramInstalled) {
+//                        // If Telegram is installed - uninstall
+//
+//                        Intent intent = new Intent(Intent.ACTION_DELETE);
+//                        intent.setData(Uri.parse("package:org.telegram.messenger"));
+//                        startActivity(intent);
+//
+////                        AccountManager am = AccountManager.get(this);
+////                        Account[] accounts = am.getAccounts();
+//                    }
+//
+//                    if(isTelegramXInstaled) {
+//                        // If Telegram X is installed - uninstall
+//
+//                        Intent intent = new Intent(Intent.ACTION_DELETE);
+//                        intent.setData(Uri.parse("package:org.thunderdog.challegram"));
+//                        startActivity(intent);
+//                    }
 
 
 
@@ -349,6 +380,9 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
                     if (counter == 3){
                         // DO delete activity here
                         // Use package name which we want to check
+
+
+
                         boolean isTelegramInstalled = appInstalledOrNot("org.telegram.messenger");
                         boolean isTelegramXInstaled = appInstalledOrNot("org.thunderdog.challegram");
 
