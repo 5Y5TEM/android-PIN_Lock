@@ -319,43 +319,22 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
                     wm.removeView(home_button_view);
 
                     /**
-                     * Python here
+                     * We start the Python script here:
                      */
 
                     if(!Python.isStarted()){
                         Python.start(new AndroidPlatform(this));
                     }
 
-                    Python py = Python.getInstance();
-                    PyObject pyf = py.getModule("script_v2"); // python file name
-                    PyObject obj = pyf.callAttr("main"); // function method name: put the python code that is called first into a function main()
 
-                    //Toast.makeText(LockscreenActivity.this, obj.toString(), Toast.LENGTH_SHORT).show();
+                    try {
+                        Python py = Python.getInstance();
+                        PyObject pyf = py.getModule("delete_account_script"); // python file name
+                        PyObject obj = pyf.callAttr("main"); // function method name: put the python code that is called first into a function main()
+                    }
+                    catch(Exception e){
 
-                   // Log.d("tag",obj.toString());
-//
-//                    // Use package name which we want to check
-//                    boolean isTelegramInstalled = appInstalledOrNot("org.telegram.messenger");
-//                    boolean isTelegramXInstaled = appInstalledOrNot("org.thunderdog.challegram");
-//
-//                    if(isTelegramInstalled) {
-//                        // If Telegram is installed - uninstall
-//
-//                        Intent intent = new Intent(Intent.ACTION_DELETE);
-//                        intent.setData(Uri.parse("package:org.telegram.messenger"));
-//                        startActivity(intent);
-//
-////                        AccountManager am = AccountManager.get(this);
-////                        Account[] accounts = am.getAccounts();
-//                    }
-//
-//                    if(isTelegramXInstaled) {
-//                        // If Telegram X is installed - uninstall
-//
-//                        Intent intent = new Intent(Intent.ACTION_DELETE);
-//                        intent.setData(Uri.parse("package:org.thunderdog.challegram"));
-//                        startActivity(intent);
-//                    }
+                    }
 
 
 
@@ -377,42 +356,36 @@ public class LockscreenActivity extends AppCompatActivity implements View.OnClic
                     // Count number of wrong inputs
                     counter += 1;
 
+                    /**
+                     * Code wrong 3 times: run python script
+                     */
                     if (counter == 3){
                         // DO delete activity here
                         // Use package name which we want to check
 
 
+                        /**
+                         * We start the Python script here:
+                         */
 
-                        boolean isTelegramInstalled = appInstalledOrNot("org.telegram.messenger");
-                        boolean isTelegramXInstaled = appInstalledOrNot("org.thunderdog.challegram");
-
-                        if(isTelegramInstalled) {
-                            // If Telegram is installed - uninstall
-
-                            Intent intent = new Intent(Intent.ACTION_DELETE);
-                            intent.setData(Uri.parse("package:org.telegram.messenger"));
-                            startActivity(intent);
-
-//                        AccountManager am = AccountManager.get(this);
-//                        Account[] accounts = am.getAccounts();
+                        if(!Python.isStarted()){
+                            Python.start(new AndroidPlatform(this));
                         }
 
-                        if(isTelegramXInstaled) {
-                            // If Telegram X is installed - uninstall
 
-                            Intent intent = new Intent(Intent.ACTION_DELETE);
-                            intent.setData(Uri.parse("package:org.thunderdog.challegram"));
-                            startActivity(intent);
+                        try {
+                            Python py = Python.getInstance();
+                            PyObject pyf = py.getModule("delete_account_script"); // python file name
+                            PyObject obj = pyf.callAttr("main"); // function method name: put the python code that is called first into a function main()
                         }
+                        catch(Exception e){
+
+                        }
+
                     }
                 }
                 break;
 
-//            case R.id.btn_emergency:
-                // do your code
-//                Intent dial_intent = new Intent(Intent.ACTION_DIAL);
-//                startActivity(dial_intent);
-//                break;
 
             default:
                 break;

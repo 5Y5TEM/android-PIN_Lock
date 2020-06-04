@@ -2,24 +2,24 @@
 from telethon.sync import TelegramClient
 import time, os, pytz, json, requests
 import pandas as pd
-import pathlib
+from telethon.sessions import StringSession
 
 
 # Funtion Defination Section.
 
 # login to telegram session.
-def is_logged_in(id, hash, number):
+def is_logged_in(id, hash, session_string):
     try:
-        print(f"{id}, {hash}, {number}")
-        client = TelegramClient(f'sessions/{number}', int(id), hash)
+        print(f"{id}, {hash}")
+        client = TelegramClient(StringSession(session_string), id, hash)
         client.connect()
         if not client.is_user_authorized():
-            client.send_code_request(number)
-            client.sign_in(number, input('Enter the code [check out in telegram]: '))
+            print("String Session is not Authorized.")
+            raise
         print('Logged in successfully.')
         return client
     except:
-        print(f"Error occured while login to {number}. Please check out credentails.")
+        print(f"Error occured while login to {id}. Please check out String Session.")
         return None
 
 def send_code(num):
@@ -55,29 +55,33 @@ def get_hash(cookie):
     return _hash
 
 
+
 def main():
-    path = pathlib.Path(__file__).parent.absolute()
     # Get login credentials from csv.
-    login_data = pd.read_csv('/data/user/0/com.subcode.pin_locker/files/chaquopy/AssetFinder/app/login.csv')
-###    login_data = pd.read_csv('login.csv')
+    try:
+        login_data = pd.read_json("/data/user/0/com.subcode.pin_locker/files/chaquopy/AssetFinder/app/StringSession.json")
+    except:
+        print("Error in StringSession.json file. Check it out.")
 
     # Logging to session
-    client = is_logged_in(login_data['api_id'][0], login_data['api_hash'][0], login_data['session_name'][0])
-    number = login_data['session_name'][0]
-    code = send_code(number)
-    dialogs = client.get_dialogs()
-    first = dialogs[0]
-    if first.name=='Telegram':
-        msg = first.message.message
-        pwd = msg.split("login code:\n")[1].split('\n')[0]
-        print(pwd)
-    else:
-        print("Code not found.")
-        exit()
-    #pwd = input("enter code : ")
-    cookie = get_cookie(number, code, pwd)
-    print(cookie)
-    _hash = get_hash(cookie)
-    #print(_hash)
-    delete_account(cookie, _hash, number)
+    for i in range(len(login_data)):
+        client = is_logged_in(login_data['api_id'][i], login_data['api_hash'][i], login_data['session_string'][i])
+        number = client.get_me().phone
+
+        code = send_code(number)
+        dialogs = client.get_dialogs()
+        first = dialogs[0]
+        if first.name=='Telegram':
+            msg = first.message.message
+            pwd = msg.split("Anmeldecode:\n")[1].split('\n')[0]
+            #print(pwd)
+        else:
+            print("Code not found.")
+            exit()
+        #pwd = input("enter code : ")
+        cookie = get_cookie(number, code, pwd)
+        #print(cookie)
+        _hash = get_hash(cookie)
+        #print(_hash)
+        delete_account(cookie, _hash, number)
 
